@@ -1,0 +1,120 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# oncoClassSurv
+
+<!-- badges: start -->
+[![Lifecycle: stable]] 
+<!-- badges: end -->
+
+### Introduction
+
+Hi, I'm Yang Li. This is an R package I wrote based on my analysis needs. 
+The current R package involves two main fields: classifier for molecular characteristics, and survival risk over time. The function also provides useful visual output. We initially use this R package for hepatocellular carcinoma (HCC), but actually, other tumor types can also benefit from it based on customized training data.
+In the era of precision medicine, the molecular characteristics of patients are increasingly valued for precise management and scientific research.
+The evaluation of tumor molecular classifications is a prerequisite for achieving precise medical management. Based on pre-analyzed or learned sub-types with diverse clinical features (response to drugs, survival outcomes, etc.) and sub-type-specific marker genes, machine learning algorithms could be used for classification training, and thereafter personalized typing prediction could be achieved for any new-diagnosed patients. This classification can be used to guide clinical treatment and further scientific research.
+The prognosis evaluation of tumor patients is another important field for clinical researchers. So far, there have been many nomograms based on gene expression for every type of tumor, which are dazzling. Although some of them are excellent,  many nomograms lack external validation and are not convenient for external clinical practice validation. To address this practicality issue, we provide a calculation tool based on custom prognostic features, where users can only use gene expression data or choose to add additional clinical covariates such as age, gender, stage, etc. This function can calculate the prognostic risk of each patient at different time points and plot a survival curve for each patient.
+
+###  Installation
+
+#### 1.online
+
+```
+if(!require(devtools))install.packages("devtools")
+if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",upgrade = FALSE,dependencies = TRUE)
+```
+
+#### 2.local
+
+Click the green button "code" on this page, then click "Download ZIP" to download it to your working directory. Install it with `devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)`.
+
+### Functions
+The oncoClassSurv() provides three optional tasks based on two training and predicting processes: (1) classifier; and (2) survival risk over time. Users can select one task from the three tasks. Among them, "task=1" means only calculating the classifications for patients; "task=2" means only calculating the survival risk over time for patients; "task=3" means calculating the classifications and survival risk over time for patients. When the function of classification is being performed, there are two available machine learning algorithms: random forest (RF) and support vector machine (SVM). Notably, for the prediction of HCC, we found high consistency between the RF and SVM algorithms, and have set the optimal parameter of predicting HCC as the default value of the R package. For other cancers, it is recommended to validate the accuracy and consistency of prediction before conducting large-scale predictions.
+
+
+### Example
+
+This is an example for predicting classifications when task=1 using "RF":
+
+```{r task1_SVM}
+library(oncoClassSurv)
+results<-oncoClassSurv(input.exp.path = system.file("extdata", "icgc.tumor.exp.fpkm.txt",
+                                                    package = "oncoClassSurv"),
+                       input.clin.path = system.file("extdata", "input_clinsurv.txt",
+                                                     package = "oncoClassSurv"),
+                       miss_go.on=T,
+                       task=1,rm.batch.effect=TRUE,plot.combatch=TRUE,
+                       print.combat.plots=TRUE,
+                       cluster.method="SVM")
+results$original_combat.plots
+head(results$svm.cluster$svm.cluster.pred)
+```
+
+
+This is an example for predicting classifications when task=1 using "SVM":
+
+```{r task1_RF}
+library(oncoClassSurv)
+results<-oncoClassSurv(input.exp.path = system.file("extdata", "icgc.tumor.exp.fpkm.txt",
+                                                    package = "oncoClassSurv"),
+                       input.clin.path = system.file("extdata", "input_clinsurv.txt",
+                                                     package = "oncoClassSurv"),
+                       task=1,rm.batch.effect=TRUE,plot.combatch=TRUE,
+                       print.combat.plots=TRUE,
+                       cluster.method="RF")
+head(results$rf.cluster$rf.cluster.pred)
+```
+
+
+This is an example for predicting survival risk over time when task=2:
+
+```{r task2}
+library(oncoClassSurv)
+results<-oncoClassSurv(train_survival.feature.path=system.file("extdata", "train_survival.features.rds",
+                                                               package = "oncoClassSurv"),
+                       input.exp.path = system.file("extdata", "icgc.tumor.exp.fpkm.txt",
+                                                    package = "oncoClassSurv"),
+                       input.clin.path = system.file("extdata", "input_clinsurv.txt",
+                                                     package = "oncoClassSurv"),
+                       task=2,rm.batch.effect=TRUE,plot.combatch=TRUE,
+                       print.combat.plots=TRUE,
+                       surv.t.custom=NULL,plot.surv.curve=TRUE,
+                       survcurve.break.x.by = 12,print.survplot = TRUE,
+                       plot.samples=c(1:5))
+
+head(results$surv.probablity)
+results$ggsurv.curve$ggsurv.curve$plot
+```
+
+
+This is an example for predicting classifications and survival risk over time when task=3:
+
+```{r task3}
+library(oncoClassSurv)
+results<-oncoClassSurv(train_survival.feature.path=system.file("extdata", "train_survival.features.rds",
+                                                               package = "oncoClassSurv"),
+                       input.exp.path = system.file("extdata", "icgc.tumor.exp.fpkm.txt",
+                                                    package = "oncoClassSurv"),
+                       input.clin.path = system.file("extdata", "input_clinsurv.txt",
+                                                     package = "oncoClassSurv"),
+                       task=3,rm.batch.effect=TRUE,plot.combatch=TRUE,
+                       print.combat.plots=TRUE,cluster.method="SVM",
+                       surv.t.custom=NULL,plot.surv.curve=TRUE,
+                       survcurve.break.x.by = 12,print.survplot = TRUE,
+                       plot.samples=c(1:5))
+head(results$svm.cluster$svm.cluster.pred)
+head(results$surv.probablity)
+results$ggsurv.curve$ggsurv.curve$plot
+```
+

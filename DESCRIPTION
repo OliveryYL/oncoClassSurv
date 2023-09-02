@@ -1,0 +1,35 @@
+Package: oncoClassSurv
+Title: Predict classifications and survival risk
+Version: 1.1.0
+Authors@R: 
+    person("Yang", "Li", email = "lymedpro@yeah.net", role = c("aut", "cre"),
+       comment = c('ORCID'="0000-0003-0827-1895"))
+Description: Classify tumors into several molecular sub-types automatically using the 
+ "random forest" or "support vector machine" algorithm based on RNA-Seq data. 
+ Visualize survival risk based on Cox regression. 
+ These processes could also be customized using training data provided by users.
+Depends: R (>= 4.1.0)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    data.table,
+    tibble,
+    stats,
+    ggplot2,
+    ggfortify,
+    patchwork,
+    randomForest,
+    e1071,
+    survival,
+    survminer,
+    BiocManager,
+    limma,
+    sva,
+    magrittr
+Suggests: knitr, rmarkdown, cowplot, ggpubr,
+        tidyr, ComplexHeatmap,dplyr
+URL: https://github.com/OliveryYL/oncoClassSurv
+BugReports: https://github.com/OliveryYL/oncoClassSurv/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3

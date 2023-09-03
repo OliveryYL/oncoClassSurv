@@ -45,17 +45,17 @@
 #' @param cluster.method A character indicating the algorithm used in the prediction for classification.
 #' Optional values include "RF" (random forest) and "SVM" (support vector machine).
 #' @param nodesize A parameter in the random forest. Details can be seen in
-#' the randomForest::randomForest().
+#' the \code{randomForest::\link{randomForest}}.
 #' @param ntree A parameter in the random forest. Details can be seen in the
-#' randomForest::randomForest().
+#' \code{randomForest::\link{randomForest}}.
 #' @param mtry A parameter in the random forest. Details can be seen in the
-#' randomForest::randomForest().
+#' \code{randomForest::\link{randomForest}}.
 #' @param importance A parameter in the random forest. Details can be seen in the
-#' randomForest::randomForest().
+#' \code{randomForest::\link{randomForest}}.
 #' @param kernel A parameter in the support vector machine. Details can be seen in the
-#' e1071::svm().
+#' \code{e1071::\link{svm}}.
 #' @param cost A parameter in the support vector machine. Details can be seen in the
-#' e1071::svm().
+#' \code{e1071::\link{svm}}.
 #' @param surv.t.custom When predicting the survival risk of patients, users can specify
 #' concerned time points. The default value is null, which means predicting for
 #' all time points.
@@ -72,11 +72,12 @@
 #' @param survtime.unit A character. The unit of the survival time, such as "days", "months", "year",
 #' etc. as per the user's demands.
 #' @param survcurve.break.x.by A number. The breakpoints of the time axis for the survival curves.
-#' The default value is 12. Details can be seen in the survminer::ggsurvplot().
+#' The default value is 12. Details can be seen in the
+#' \code{survminer::\link{ggsurvplot}}.
 #' @param print.survplot A logical value. Whether visualize curves of survival risk over time for
 #' individual patients in the current graph panel. This item works when the item
 #' of "plot.surv.curve" is TRUE. The default value is FALSE.
-#'
+#' @param show.message Whether to display redundant detection information. The default value is TRUE.
 #' @author Yang Li
 #'
 #' @return A list including classifications or survival risk results or both of them. The returned results depend on the task performed.
@@ -103,19 +104,18 @@
 #' #perform task 1 (classify by SVM)
 #' results<-oncoClassSurv(input.exp.path = system.file("extdata",
 #' "icgc.tumor.exp.fpkm.txt",package = "oncoClassSurv"),
-#' input.clin.path = system.file("extdata", "input_clinsurv.txt",
-#' package = "oncoClassSurv"),miss_go.on=T,task=1,
-#' rm.batch.effect=TRUE,plot.combatch=TRUE,
-#' print.combat.plots=TRUE,cluster.method="SVM")
+#' miss_go.on=T,task=1,rm.batch.effect=TRUE,
+#' plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="SVM",
+#' show.message=FALSE)
 #' }
 #'
 #' \dontrun{
 #' #perform task 1 (classify by RF)
 #' results<-oncoClassSurv(input.exp.path = system.file("extdata",
 #' "icgc.tumor.exp.fpkm.txt",package = "oncoClassSurv"),
-#' input.clin.path = system.file("extdata", "input_clinsurv.txt",
-#' package = "oncoClassSurv"),task=1,rm.batch.effect=TRUE,
-#' plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="RF")
+#' task=1,rm.batch.effect=TRUE,
+#' plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="RF",
+#' show.message=FALSE)
 #' }
 #'
 #' \dontrun{
@@ -128,7 +128,8 @@
 #'  task=2,rm.batch.effect=TRUE,plot.combatch=TRUE,
 #'  print.combat.plots=TRUE,surv.t.custom=NULL,
 #'  plot.surv.curve=TRUE,survcurve.break.x.by = 12,
-#'  print.survplot = TRUE,plot.samples=c(1:5))
+#'  print.survplot = TRUE,plot.samples=c(1:5),
+#'  show.message=FALSE)
 #' }
 #'
 #' \dontrun{
@@ -140,10 +141,15 @@
 #' "input_clinsurv.txt",package = "oncoClassSurv"),task=3,
 #' rm.batch.effect=TRUE,plot.combatch=TRUE,print.combat.plots=TRUE,
 #' cluster.method="SVM",surv.t.custom=NULL,plot.surv.curve=TRUE,
-#' survcurve.break.x.by = 12,print.survplot = TRUE,plot.samples=c(1:5))
+#' survcurve.break.x.by = 12,print.survplot = TRUE,plot.samples=c(1:5),
+#' show.message=FALSE)
 #' }
-#'
-#'
+##' @seealso
+##' \code{sva::\link{ComBat}};
+##' \code{randomForest::\link{randomForest}};
+##' \code{e1071::\link{svm}};
+##' \code{survminer::\link{ggsurvplot}}
+
 oncoClassSurv<-function(exp.type="fpkm",
                         train.exp.path=system.file("extdata", paste0("train.tumor.exp.",exp.type,".txt"),
                                                    package = "oncoClassSurv"),
@@ -162,31 +168,7 @@ oncoClassSurv<-function(exp.type="fpkm",
                         surv.t.custom=NULL,time="OS",event=1,
                         plot.surv.curve=TRUE,plot.samples=c(1:5),
                         survtime.unit="months",
-                        survcurve.break.x.by=12,print.survplot=FALSE){
-  # #安装并加载R包
-  # rpkgs<-c("data.table","tibble","dplyr","stats","ggplot2","ggplotify","patchwork","randomForest",
-  #          "e1071","survminer","survival")
-  # for (i in rpkgs) {
-  #   if (!requireNamespace(i, quietly = TRUE)) {
-  #     install.packages(i, update = FALSE)
-  #   }
-  # };rm(i)
-  #
-  # if (!require("BiocManager", quietly = TRUE)){
-  #   install.packages("BiocManager")
-  #   if(!requireNamespace("limma", quietly = TRUE)){
-  #     BiocManager::install("limma")
-  #   }
-  # }
-  #
-  # if (!require("BiocManager", quietly = TRUE)){
-  #   install.packages("BiocManager")
-  #   if(!requireNamespace("sva", quietly = TRUE)){
-  #     BiocManager::install("sva")
-  #   }
-  # }
-  #
-  # base::lapply(c(rpkgs,"limma","sva"),library,character.only=TRUE)
+                        survcurve.break.x.by=12,print.survplot=FALSE,show.message=TRUE){
 
   #收集分析结果
   return.list<-list()
@@ -197,8 +179,13 @@ oncoClassSurv<-function(exp.type="fpkm",
   input.tumor.exp<-data.table::fread(file = input.exp.path,data.table = F,showProgress = T)%>%
     tibble::column_to_rownames(var = "Features")
 
+  rownames(train.tumor.exp)<-gsub(rownames(train.tumor.exp),pattern="-",replacement="_")
+  rownames(input.tumor.exp)<-gsub(rownames(input.tumor.exp),pattern="-",replacement="_")
+
   #2.统计基因与样本数目####
-  message(paste0("Input: ",dim(input.tumor.exp)[1]," Features",", ",dim(input.tumor.exp)[2]," Samples.\n"))
+  if(show.message){
+    message(paste0("Input: ",dim(input.tumor.exp)[1]," Features",", ",dim(input.tumor.exp)[2]," Samples.\n"))
+  }
 
   #3.缺失值检查check.NA####
   check.NA<-function (data) {
@@ -232,12 +219,16 @@ oncoClassSurv<-function(exp.type="fpkm",
     None.feature<-cluster_markergenes[!cluster_markergenes%in%rownames(input.tumor.exp)]
     if(length(None.feature)>0){
       if(miss_go.on){
-        message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
-                       "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
-                       ", but ",nrow(input.tumor.exp)," in your input data."))
-        message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        if(show.message){
+          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
+                         "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
+                         ", but ",nrow(input.tumor.exp)," in your input data."))
+          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        }
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
+        train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
+        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]
       }else{
         stop("Need complete input file including all essential features.")
       }
@@ -250,6 +241,10 @@ oncoClassSurv<-function(exp.type="fpkm",
       prog.signif.features<-data.table::fread(train_survival.feature.path,data.table = F)[,1]
     }
     prog.signif.features<-gsub(prog.signif.features,pattern="-",replacement="_")
+    #保留表达谱文件中的共同基因
+    co_genes<-base::intersect(rownames(train.tumor.exp),rownames(input.tumor.exp))
+    train.tumor.exp<-train.tumor.exp[co_genes,]
+    input.tumor.exp<-input.tumor.exp[co_genes,]
   }
   if(task==3){
     if(grepl(x=train_cluster.feature.path,pattern = "\\.rds$")){
@@ -278,14 +273,13 @@ oncoClassSurv<-function(exp.type="fpkm",
         message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
+        train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
+        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]
       }else{
         stop("Need complete input file including all essential features.")
       }
     }
   }
-
-  rownames(train.tumor.exp)<-gsub(rownames(train.tumor.exp),pattern="-",replacement="_")
-  rownames(input.tumor.exp)<-gsub(rownames(input.tumor.exp),pattern="-",replacement="_")
 
   #5.标准化####
   #5.1使用limma去重基因，平均，标准化
@@ -383,8 +377,9 @@ oncoClassSurv<-function(exp.type="fpkm",
     train.tumor.exp<-train.tumor.exp%>%t()%>%as.data.frame()
     train.tumor.dt<-cbind(train.tumor.clin.surv,train.tumor.exp[rownames(train.tumor.clin.surv),])
 
-    input.tumor.exp=batchremove_combat[,(dim(train.tumor.exp)[2]+1):dim(batchremove_combat)[2]]
+    input.tumor.exp=batchremove_combat[,(dim(train.tumor.exp)[1]+1):dim(batchremove_combat)[2]]
     input.tumor.exp<-input.tumor.exp%>%t()%>%as.data.frame()
+
     if(task%in%c(2,3)&!is.null(input.clin.path)){
       input.tumor.dt<-cbind(input.clinsurv[rownames(input.tumor.exp),],input.tumor.exp)
     }else{if(task%in%c(2,3)){
@@ -404,6 +399,8 @@ oncoClassSurv<-function(exp.type="fpkm",
     }
     }
   }
+
+
 
   #choose task and perform that#
   if(task==1){
@@ -497,7 +494,9 @@ oncoClassSurv<-function(exp.type="fpkm",
         ggplot2::guides(col=ggplot2::guide_legend(ncol = gg.ncol,
                                                   keywidth = ggplot2::unit(gg.key,"mm"),
                                                   keyheight = ggplot2::unit(gg.key,"mm")))
-      print(input.ggsurv.curve)
+      if(print.survplot==T){
+        print(input.ggsurv.curve)
+      }
       return.list[["ggsurv.curve"]]<-list( plot.samples=plot.samples,
                                            ggsurv.curve=input.ggsurv.curve)}}
   if(task==3){

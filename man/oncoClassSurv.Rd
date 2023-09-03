@@ -34,7 +34,8 @@ oncoClassSurv(
   plot.samples = c(1:5),
   survtime.unit = "months",
   survcurve.break.x.by = 12,
-  print.survplot = FALSE
+  print.survplot = FALSE,
+  show.message = TRUE
 )
 }
 \arguments{
@@ -93,22 +94,22 @@ results in the current graph panel. This item works when the item of "plot.comba
 Optional values include "RF" (random forest) and "SVM" (support vector machine).}
 
 \item{nodesize}{A parameter in the random forest. Details can be seen in
-the randomForest::randomForest().}
+the \code{randomForest::\link{randomForest}}.}
 
 \item{ntree}{A parameter in the random forest. Details can be seen in the
-randomForest::randomForest().}
+\code{randomForest::\link{randomForest}}.}
 
 \item{mtry}{A parameter in the random forest. Details can be seen in the
-randomForest::randomForest().}
+\code{randomForest::\link{randomForest}}.}
 
 \item{importance}{A parameter in the random forest. Details can be seen in the
-randomForest::randomForest().}
+\code{randomForest::\link{randomForest}}.}
 
 \item{kernel}{A parameter in the support vector machine. Details can be seen in the
-e1071::svm().}
+\code{e1071::\link{svm}}.}
 
 \item{cost}{A parameter in the support vector machine. Details can be seen in the
-e1071::svm().}
+\code{e1071::\link{svm}}.}
 
 \item{surv.t.custom}{When predicting the survival risk of patients, users can specify
 concerned time points. The default value is null, which means predicting for
@@ -132,11 +133,14 @@ select only the patients concerned by the user (default is numbered 1, 2, 3,
 etc. as per the user's demands.}
 
 \item{survcurve.break.x.by}{A number. The breakpoints of the time axis for the survival curves.
-The default value is 12. Details can be seen in the survminer::ggsurvplot().}
+The default value is 12. Details can be seen in the
+\code{survminer::\link{ggsurvplot}}.}
 
 \item{print.survplot}{A logical value. Whether visualize curves of survival risk over time for
 individual patients in the current graph panel. This item works when the item
 of "plot.surv.curve" is TRUE. The default value is FALSE.}
+
+\item{show.message}{Whether to display redundant detection information. The default value is TRUE.}
 }
 \value{
 A list including classifications or survival risk results or both of them. The returned results depend on the task performed.
@@ -151,19 +155,18 @@ Visualization for survival risk based on Cox regression.
 #perform task 1 (classify by SVM)
 results<-oncoClassSurv(input.exp.path = system.file("extdata",
 "icgc.tumor.exp.fpkm.txt",package = "oncoClassSurv"),
-input.clin.path = system.file("extdata", "input_clinsurv.txt",
-package = "oncoClassSurv"),miss_go.on=T,task=1,
-rm.batch.effect=TRUE,plot.combatch=TRUE,
-print.combat.plots=TRUE,cluster.method="SVM")
+miss_go.on=T,task=1,rm.batch.effect=TRUE,
+plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="SVM",
+show.message=FALSE)
 }
 
 \dontrun{
 #perform task 1 (classify by RF)
 results<-oncoClassSurv(input.exp.path = system.file("extdata",
 "icgc.tumor.exp.fpkm.txt",package = "oncoClassSurv"),
-input.clin.path = system.file("extdata", "input_clinsurv.txt",
-package = "oncoClassSurv"),task=1,rm.batch.effect=TRUE,
-plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="RF")
+task=1,rm.batch.effect=TRUE,
+plot.combatch=TRUE,print.combat.plots=TRUE,cluster.method="RF",
+show.message=FALSE)
 }
 
 \dontrun{
@@ -176,7 +179,8 @@ results<-oncoClassSurv(train_survival.feature.path=system.file("extdata",
  task=2,rm.batch.effect=TRUE,plot.combatch=TRUE,
  print.combat.plots=TRUE,surv.t.custom=NULL,
  plot.surv.curve=TRUE,survcurve.break.x.by = 12,
- print.survplot = TRUE,plot.samples=c(1:5))
+ print.survplot = TRUE,plot.samples=c(1:5),
+ show.message=FALSE)
 }
 
 \dontrun{
@@ -188,10 +192,15 @@ package = "oncoClassSurv"),input.clin.path = system.file("extdata",
 "input_clinsurv.txt",package = "oncoClassSurv"),task=3,
 rm.batch.effect=TRUE,plot.combatch=TRUE,print.combat.plots=TRUE,
 cluster.method="SVM",surv.t.custom=NULL,plot.surv.curve=TRUE,
-survcurve.break.x.by = 12,print.survplot = TRUE,plot.samples=c(1:5))
+survcurve.break.x.by = 12,print.survplot = TRUE,plot.samples=c(1:5),
+show.message=FALSE)
 }
-
-
+}
+\seealso{
+\code{sva::\link{ComBat}};
+\code{randomForest::\link{randomForest}};
+\code{e1071::\link{svm}};
+\code{survminer::\link{ggsurvplot}}
 }
 \author{
 Yang Li

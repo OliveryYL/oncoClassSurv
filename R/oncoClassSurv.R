@@ -267,10 +267,12 @@ oncoClassSurv<-function(exp.type="fpkm",
     None.feature<-cluster_markergenes[!cluster_markergenes%in%rownames(input.tumor.exp)]
     if(length(None.feature)>0){
       if(miss_go.on){
-        message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
-                       "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
-                       ", but ",nrow(input.tumor.exp)," in your input data."))
-        message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        if(show.message){
+          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
+                         "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
+                         ", but ",nrow(input.tumor.exp)," in your input data."))
+          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        }
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
         train.tumor.exp<-train.tumor.exp[cluster_markergenes,]

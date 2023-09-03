@@ -314,12 +314,6 @@ results<-oncoClassSurv(train_survival.feature.path=system.file("extdata", "train
                        surv.t.custom=NULL,plot.surv.curve=TRUE,
                        survcurve.break.x.by = 12,print.survplot = FALSE,
                        plot.samples=c(1:10),show.message=FALSE)
-#> 
-#> Please check your input features!
-#> Notice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.
-#> Number of Marker features in the train data: 521, but 495 in your input data.
-#> 
-#> Missing features: PKM,IGKV3_11,IGHG2,IGKV4_1,IGKV3_20,IGHG3,IGHG1,IGKC,IGLC2,IGLV3_19,IGHG4,IGLV2_23,IGLC3,OR2I1P,IGHA1,IGHM,RIDA,ETNPPL,TKFC,SC5D,MSMO1,HJV,SELENOP,RACK1,CYP2B7P,ATP5MC2,NOP53,LRRC75A_AS1,RPL9P9
 #> Input data is performing log2(expression+1)...
 #> log2(expression+1) finished.
 #> Found2batches

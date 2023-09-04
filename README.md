@@ -9,51 +9,37 @@
 
 ### Introduction
 
-Hi, everyone! I’m Yang Li. In the era of precision medicine, the
-molecular characteristics of patients are increasingly valued for
-precise management and scientific research. I developed this R package
-because it will be useful for molecular classifications and
-individualized prognosis evaluation. The current R package involves two
-main fields: classifier for molecular characteristics, and survival risk
-over time. The function also provides useful visual output. I also
-noticed that different datasets have batch effects, which increases the
-difficulty of accurate evaluation. To simplify this process, I optimized
-the function. When this function is executed, the batch effects between
-different datasets will be automatically removed. In addition, we
-initially used this R package for hepatocellular carcinoma (HCC), but
-actually, other tumor types can also benefit from it based on customized
-training data. The evaluation of tumor molecular classifications is a
-prerequisite for achieving precise medical management. Based on
-pre-analyzed or learned sub-types with diverse clinical features
-(response to drugs, survival outcomes, etc.) and sub-type-specific
-marker genes, machine learning algorithms could be used for
-classification training, and thereafter personalized typing prediction
-could be achieved for any new-diagnosed patients. This classification
-can be used to guide clinical treatment and further scientific research.
-The prognosis evaluation of tumor patients is another important field
-for clinical researchers. So far, there have been many nomograms based
-on gene expression for every type of tumor, which are dazzling. Although
-some of them are excellent, many nomograms lack external validation and
-are not convenient for external clinical practice validation. To address
-this practicality issue, we provide a calculation tool based on custom
-prognostic features, where users can use gene expression data or choose
-to add additional clinical covariates such as age, gender, stage, etc.
-This function can calculate the prognostic risk of each patient at
-different time points and plot a survival curve for each patient. Any
-questions or tips, please don’t hesitate to let me know!
+Hi, everyone! I’m Yang Li. In the era of precision medicine, the molecular characteristics of patients are increasingly valued for precise management and scientific research. 
+I developed this R package because it will be useful for molecular classifications and individualized prognosis evaluation. 
+
+The current R package involves two main fields: classifier for molecular characteristics, and survival risk over time. The function also provides useful visual output. I also
+noticed that different datasets have batch effects, which increases the difficulty of accurate evaluation. To simplify this process, I optimized the function. When this function 
+is executed, the batch effects between different datasets will be automatically removed. In addition, we initially used this R package for hepatocellular carcinoma (HCC), but
+actually, other kind of tumors or even non-tumor disease can also benefit from it based on the user's customized training data. 
+
+The evaluation of tumor molecular classifications is a prerequisite for achieving precise medical management. Based on pre-analyzed or learned sub-types with diverse clinical 
+features (response to drugs, survival outcomes, etc.) and sub-type-specific marker genes, machine learning algorithms could be used for classification training, and thereafter 
+personalized typing prediction could be achieved for any new-diagnosed patients. This classification can be used to guide clinical treatment and further scientific research.
+
+The prognosis evaluation of tumor patients is a key concern for patients and clinical researchers. So far, there have been many nomograms based on gene expression for every 
+type of tumor, which are dazzling. Although some of them are excellent, many nomograms lack external validation and are not convenient for external clinical practice validation. 
+To address this practicality issue, we provide a calculation tool based on custom prognostic features, where users can use gene expression data or choose to add additional clinical 
+covariates such as age, gender, stage, etc. This function can calculate the prognostic risk of each patient at different time points and plot a survival curve for each patient. 
+
+Any questions or tips, please don’t hesitate to let me know!
 
 ### Installation
 
-#### 1.online
-
-    if(!require(devtools))install.packages("devtools")
-    if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",upgrade = FALSE,dependencies = TRUE)
-
-#### 2.local
-
-Click the green button “code” on this page, then click “Download ZIP” to
-download it to your working directory. Install it with
-`devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)`.
+1)  Online
+```{r Online installation}
+if(!require(devtools))install.packages("devtools")
+if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",upgrade = FALSE,dependencies = TRUE)
+```
+2)  Local
+```{r Local installation}
+#Click the green button “code” on this page, then click “Download ZIP” to download it to your working directory. Install it with:
+#`devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)`.
+```
 
 ### Functions
 

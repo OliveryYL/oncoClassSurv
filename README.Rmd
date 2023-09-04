@@ -41,8 +41,8 @@ if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",up
 
 2. Local
 ```{r Local installation}
-#Click the green button "code" on this page, then click "Download ZIP" to download it to your working directory. Install it with:
-#`devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)`.
+#Click the green button "code" on this page, then click "Download ZIP" to download it to your R working directory. Install it with:
+#devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)
 ```
 
 

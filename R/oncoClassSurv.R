@@ -228,7 +228,13 @@ oncoClassSurv<-function(exp.type="fpkm",
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
         train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
-        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]
+
+        col.label<-colnames(input.tumor.exp)
+        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]%>%as.data.frame()
+        colnames(input.tumor.exp)<-col.label
+        rownames(input.tumor.exp)<-cluster_markergenes
+
+
       }else{
         stop("Need complete input file including all essential features.")
       }
@@ -244,7 +250,12 @@ oncoClassSurv<-function(exp.type="fpkm",
     #保留表达谱文件中的共同基因
     co_genes<-base::intersect(rownames(train.tumor.exp),rownames(input.tumor.exp))
     train.tumor.exp<-train.tumor.exp[co_genes,]
-    input.tumor.exp<-input.tumor.exp[co_genes,]
+
+    col.label<-colnames(input.tumor.exp)
+    input.tumor.exp<-input.tumor.exp[co_genes,]%>%as.data.frame()
+    colnames(input.tumor.exp)<-col.label
+    rownames(input.tumor.exp)<-co_genes
+
   }
   if(task==3){
     if(grepl(x=train_cluster.feature.path,pattern = "\\.rds$")){
@@ -276,7 +287,13 @@ oncoClassSurv<-function(exp.type="fpkm",
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
         train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
-        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]
+
+
+        col.label<-colnames(input.tumor.exp)
+        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]%>%as.data.frame()
+        colnames(input.tumor.exp)<-col.label
+        rownames(input.tumor.exp)<-cluster_markergenes
+
       }else{
         stop("Need complete input file including all essential features.")
       }
@@ -306,7 +323,12 @@ oncoClassSurv<-function(exp.type="fpkm",
 
   #6.选择是否进行combat()####
   if(rm.batch.effect){
-    exp.join<-cbind(train.tumor.exp,input.tumor.exp[rownames(train.tumor.exp),])
+
+    input.tumor.exp.1<-input.tumor.exp[rownames(train.tumor.exp),]%>%as.data.frame()
+    colnames(input.tumor.exp.1)<-col.label
+    rownames(input.tumor.exp.1)<-rownames(train.tumor.exp)
+
+    exp.join<-cbind(train.tumor.exp,input.tumor.exp.1)
     batch<-base::rep(c("Train","Input"),c(dim(train.tumor.exp)[2],dim(input.tumor.exp)[2]))
     batch<-factor(batch,levels = c("Train","Input"))
 
@@ -379,7 +401,9 @@ oncoClassSurv<-function(exp.type="fpkm",
     train.tumor.exp<-train.tumor.exp%>%t()%>%as.data.frame()
     train.tumor.dt<-cbind(train.tumor.clin.surv,train.tumor.exp[rownames(train.tumor.clin.surv),])
 
-    input.tumor.exp=batchremove_combat[,(dim(train.tumor.exp)[1]+1):dim(batchremove_combat)[2]]
+    input.tumor.exp=batchremove_combat[,(dim(train.tumor.exp)[1]+1):dim(batchremove_combat)[2]]%>%
+      as.data.frame()
+    colnames(input.tumor.exp)<-col.label
     input.tumor.exp<-input.tumor.exp%>%t()%>%as.data.frame()
 
     if(task%in%c(2,3)&!is.null(input.clin.path)){
@@ -449,6 +473,7 @@ oncoClassSurv<-function(exp.type="fpkm",
 
     #预测生存曲线
     input.surv.curve<-survival::survfit(train.coxfit,newdata = input.tumor.dt)
+
     #根据生存曲线计算生存概率
     input.surv.probablity=data.frame(Time=summary(input.surv.curve)$time,
                                      SurvivalProbablity=summary(input.surv.curve)$surv)

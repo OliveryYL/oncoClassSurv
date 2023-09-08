@@ -26,7 +26,7 @@ The current R package involves two main fields: classifier for molecular charact
 
 The evaluation of tumor molecular classifications is a prerequisite for achieving precise medical management. Based on pre-analyzed or learned sub-types with diverse clinical features (response to drugs, survival outcomes, etc.) and sub-type-specific marker genes, machine learning algorithms could be used for classification training, and thereafter personalized typing prediction could be achieved for any new-diagnosed patients. This classification can be used to guide clinical treatment and further scientific research.
 
-The prognosis evaluation of tumor patients is a key concern for patients and clinical researchers. So far, there have been many nomograms based on gene expression for every type of tumor, which are dazzling. Although some of them are excellent,  many nomograms lack external validation and are not convenient for external clinical practice validation. To address this practicality issue, we provide a calculation tool based on custom prognostic features, where users can use gene expression data or choose to add additional clinical covariates such as age, gender, stage, etc. This function can calculate the prognostic risk of each patient at different time points and plot a survival curve for each patient.
+The prognosis evaluation of tumor patients is a key concern for patients and clinical researchers. So far, there have been many nomograms based on gene expression for every type of tumor, which are dazzling. Although some of them are excellent,  many nomograms lack external validation and are not convenient for external clinical practice validation. To address this practicality issue, we provide a calculation tool based on customized prognostic features, where users can use gene expression data or choose to add additional clinical covariates such as age, gender, stage, etc. This function can calculate the prognostic risk of each patient at different time points and plot a survival curve for each patient.
 
 Any questions or tips, please don't hesitate to let me know!
 
@@ -48,6 +48,8 @@ if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",up
 
 ### Functions
 The `oncoClassSurv()` provides three optional tasks based on two training and predicting processes: (1) classifier; and (2) survival risk over time. Users can select one task from the three tasks. Among them, `"task=1"` means only calculating the classifications for patients; `"task=2"` means only calculating the survival risk over time for patients; `"task=3"` means calculating the classifications and survival risk over time for patients. When the function of classification is being performed, there are two available machine learning algorithms: random forest (RF) and support vector machine (SVM). Notably, for the prediction of HCC, we found high consistency between the RF and SVM algorithms, and have set the optimal parameter of predicting HCC as the default value of the R package. For other cancers, it is recommended to validate the accuracy and consistency of prediction before conducting large-scale predictions.
+
+In addition, to overcome the tedious steps of programming and make it friendly for ordinary users, we developed an interactive application based on Shiny. Users only need to use the command `oncoClassSurv_RunShiny()` to visit it.
 
 
 ### Data prepare
@@ -183,4 +185,40 @@ head(results$svm.cluster$svm.cluster.pred)
 results$surv.probablity[1:6,1:5]
 results$ggsurv.curve$ggsurv.curve$plot
 ```
+
+
+### Interactive ShinyAPP
+Run `ShinyAPP` by `oncoClassSurv_RunShiny()`:
+
+```{r runShiny}
+# library(oncoClassSurv)
+# oncoClassSurv_RunShiny()
+```
+
+Description: All `.pdf` or `.csv` files can be downloaded to the local disk.
+
+(1) Run `oncoClassSurv_RunShiny()` using the default settings.
+README-runShinyAPP-demo1_use_by_default.png
+
+(2) Run `oncoClassSurv_RunShiny()` to predict the classifications for a customized cohort.
+README-runShinyAPP-demo1_classifications.png
+
+(3) Run `oncoClassSurv_RunShiny()` to predict the prognosis for a customized cohort.
+README-runShinyAPP-demo2_survivalPrediction.png
+
+(4) The output tables. 
+Classification table is in the left. Prognosis table is in the right.
+README-runShinyAPP-demo3_tables.png
+
+(5) Users can select interesting samples for further research.
+README-runShinyAPP-demo4_select_sample.png
+
+(6) Analyses for curated samples and genes.
+README-runShinyAPP-demo5_select_sample_gene_heatmap.png
+
+(7) Survival curves and the process to remove batch effect.
+README-runShinyAPP-demo6_select_samples_survival_and_combat.png
+
+
+Follow us for updates.
 

@@ -23,7 +23,7 @@ personalized typing prediction could be achieved for any new-diagnosed patients.
 
 The prognosis evaluation of tumor patients is a key concern for patients and clinical researchers. So far, there have been many nomograms based on gene expression for every 
 type of tumor, which are dazzling. Although some of them are excellent, many nomograms lack external validation and are not convenient for external clinical practice validation. 
-To address this practicality issue, we provide a calculation tool based on custom prognostic features, where users can use gene expression data or choose to add additional clinical 
+To address this practicality issue, we provide a calculation tool based on customized prognostic features, where users can use gene expression data or choose to add additional clinical 
 covariates such as age, gender, stage, etc. This function can calculate the prognostic risk of each patient at different time points and plot a survival curve for each patient. 
 
 Any questions or tips, please don’t hesitate to let me know!
@@ -335,3 +335,39 @@ results$ggsurv.curve$ggsurv.curve$plot
 ```
 
 <img src="man/figures/README-task3-1.png" width="100%" />
+
+
+### Interactive ShinyAPP
+Run `ShinyAPP` by `oncoClassSurv_RunShiny()`:
+
+``` r
+# library(oncoClassSurv)
+# oncoClassSurv_RunShiny()
+```
+
+Description: All `.pdf` or `.csv` files can be downloaded to the local disk.
+
+1) Run `oncoClassSurv_RunShiny()` using the default settings.
+<img src="man/figures/README-runShinyAPP-demo1_use_by_default.png" width="100%" />
+
+2) Run `oncoClassSurv_RunShiny()` to predict the classifications for a customized cohort.
+<img src="man/figures/README-runShinyAPP-demo1_classifications.png" width="100%" />
+
+3) Run `oncoClassSurv_RunShiny()` to predict the prognosis for a customized cohort.
+<img src="man/figures/README-runShinyAPP-demo2_survivalPrediction.png" width="100%" />
+
+4) The output tables. 
+Classification table is in the left. Prognosis table is in the right.
+<img src="man/figures/README-runShinyAPP-demo3_tables.png" width="100%" />
+
+5) Users can select interesting samples for further research.
+<img src="man/figures/README-runShinyAPP-demo4_select_sample.png" width="100%" />
+
+6) Analyses for curated samples and genes.
+<img src="man/figures/README-runShinyAPP-demo5_select_sample_gene_heatmap.png" width="100%" />
+
+7) Survival curves and the process to remove batch effect.
+<img src="man/figures/README-runShinyAPP-demo6_select_samples_survival_and_combat.png" width="100%" />
+
+
+Follow us for updates.

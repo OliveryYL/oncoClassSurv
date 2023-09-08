@@ -6,6 +6,7 @@
 \usage{
 oncoClassSurv(
   exp.type = "fpkm",
+  gene.col.label = "Features",
   train.exp.path = system.file("extdata", paste0("train.tumor.exp.", exp.type, ".txt"),
     package = "oncoClassSurv"),
   train.clin.path = system.file("extdata", "train.cluster.surv.rds", package =
@@ -42,6 +43,10 @@ oncoClassSurv(
 \item{exp.type}{A character for the normalized format of RNA-Seq expression matrix. The default
 is "fpkm", and the other option is "tpm". Please use the consistent
 "exp.type" in both train expression matrix and input expression matrix.}
+
+\item{gene.col.label}{The column labels of genes in both the training and input expression profile
+files should be the same. The default value in the training cohort is
+"Features".}
 
 \item{train.exp.path}{The path of the RNA-Seq expression profile of the training cohort.
 The default path is 'system.file("extdata", paste0("train.tumor.exp.", exp.type,

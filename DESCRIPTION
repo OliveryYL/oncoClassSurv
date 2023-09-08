@@ -26,9 +26,13 @@ Imports:
     BiocManager,
     limma,
     sva,
-    magrittr
+    magrittr,
+    shiny,
+    ComplexHeatmap,
+    circlize,
+    ggplotify
 Suggests: knitr, rmarkdown, cowplot, ggpubr,
-        tidyr, ComplexHeatmap,dplyr
+        tidyr,dplyr
 URL: https://github.com/OliveryYL/oncoClassSurv
 BugReports: https://github.com/OliveryYL/oncoClassSurv/issues
 Roxygen: list(markdown = TRUE)

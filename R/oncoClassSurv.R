@@ -6,6 +6,9 @@
 #' @param exp.type A character for the normalized format of RNA-Seq expression matrix. The default
 #' is "fpkm", and the other option is "tpm". Please use the consistent
 #' "exp.type" in both train expression matrix and input expression matrix.
+#' @param gene.col.label The column labels of genes in both the training and input expression profile
+#' files should be the same. The default value in the training cohort is
+#' "Features".
 #' @param train.exp.path The path of the RNA-Seq expression profile of the training cohort.
 #' The default path is 'system.file("extdata", paste0("train.tumor.exp.", exp.type,
 #' ".txt"),package = "oncoClassSurv")' depending on the "exp.type".
@@ -150,7 +153,7 @@
 ##' \code{e1071::\link{svm}};
 ##' \code{survminer::\link{ggsurvplot}}
 
-oncoClassSurv<-function(exp.type="fpkm",
+oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
                         train.exp.path=system.file("extdata", paste0("train.tumor.exp.",exp.type,".txt"),
                                                    package = "oncoClassSurv"),
                         train.clin.path=system.file("extdata", "train.cluster.surv.rds",
@@ -175,16 +178,16 @@ oncoClassSurv<-function(exp.type="fpkm",
 
   #1.上传数据：表达谱####
   train.tumor.exp<-data.table::fread(file = train.exp.path,data.table = F,showProgress = T)%>%
-    tibble::column_to_rownames(var = "Features")
+    tibble::column_to_rownames(var = gene.col.label)
   input.tumor.exp<-data.table::fread(file = input.exp.path,data.table = F,showProgress = T)%>%
-    tibble::column_to_rownames(var = "Features")
+    tibble::column_to_rownames(var = gene.col.label)
 
   rownames(train.tumor.exp)<-gsub(rownames(train.tumor.exp),pattern="-",replacement="_")
   rownames(input.tumor.exp)<-gsub(rownames(input.tumor.exp),pattern="-",replacement="_")
 
   #2.统计基因与样本数目####
   if(show.message){
-    message(paste0("Input: ",dim(input.tumor.exp)[1]," Features",", ",dim(input.tumor.exp)[2]," Samples.\n"))
+    message(paste0("Input: ",dim(input.tumor.exp)[1]," ",gene.col.label,", ",dim(input.tumor.exp)[2]," Samples.\n"))
   }
 
   #3.缺失值检查check.NA####
@@ -318,7 +321,9 @@ oncoClassSurv<-function(exp.type="fpkm",
       message("log2(expression+1) finished.")
     }
   }else{
-    stop("Check your input data for negative expression values.")
+    Neg.expression.warning<-"Please check if the input expression data has undergone logarithmic conversion, as there are negative values in it."
+    warning(Neg.expression.warning)
+    return.list[["Neg.expression.warning"]]<-Neg.expression.warning
   }
 
   #6.选择是否进行combat()####
@@ -329,44 +334,44 @@ oncoClassSurv<-function(exp.type="fpkm",
     rownames(input.tumor.exp.1)<-rownames(train.tumor.exp)
 
     exp.join<-cbind(train.tumor.exp,input.tumor.exp.1)
-    batch<-base::rep(c("Train","Input"),c(dim(train.tumor.exp)[2],dim(input.tumor.exp)[2]))
-    batch<-factor(batch,levels = c("Train","Input"))
+    Batch<-base::rep(c("Train","Input"),c(dim(train.tumor.exp)[2],dim(input.tumor.exp)[2]))
+    Batch<-factor(Batch,levels = c("Train","Input"))
 
     #library(sva)
-    batchremove_combat <- sva::ComBat(dat = as.matrix(exp.join), batch = batch)
+    batchremove_combat <- sva::ComBat(dat = as.matrix(exp.join), batch = Batch)
 
     if(plot.combatch){
       #library(ggfortify)
       exp.join.dt <- as.data.frame(t(exp.join))
-      exp.join.dt$batch <- batch
+      exp.join.dt$Batch <- Batch
       exp.join.pca<-ggplot2::autoplot(stats::prcomp(exp.join.dt[,1:(ncol(exp.join.dt)-1)] ),
-                                      data=exp.join.dt,colour = 'batch',
+                                      data=exp.join.dt,colour = 'Batch',
                                       frame.type = 'norm')+
         ggplot2::theme_bw()+
         ggplot2::theme(line =ggplot2::element_line(linewidth = 0.2),
                        legend.position = "top",
-                       legend.title =ggplot2::element_text(size = 6,color = "black") ,
-                       legend.text =ggplot2::element_text(size = 6),
-                       legend.key.size =ggplot2::unit(3,units = "mm"),
+                       legend.title =ggplot2::element_text(size = 8,color = "black") ,
+                       legend.text =ggplot2::element_text(size = 8),
+                       legend.key.size =ggplot2::unit(3.5,units = "mm"),
                        axis.text = ggplot2::element_text(size = 6,color = "black"),
                        axis.text.x =ggplot2::element_blank(),
-                       axis.title =ggplot2::element_text(size = 8,color = "black"))+
+                       axis.title =ggplot2::element_text(size = 10,color = "black"))+
         ggplot2::labs(title ="Before ComBat")
 
       combat <- as.data.frame(t(batchremove_combat))
-      combat$batch <- batch
+      combat$Batch <- Batch
       combat.pca<-ggplot2::autoplot(stats::prcomp(combat[,1:(ncol(combat)-1)] ),
-                                    data=combat,colour = 'batch',
+                                    data=combat,colour = 'Batch',
                                     frame.type = 'norm')+
         ggplot2::theme_bw()+
         ggplot2::theme(line =ggplot2::element_line(linewidth = 0.2),
                        legend.position = "top",
-                       legend.title =ggplot2::element_text(size = 6,color = "black") ,
-                       legend.text =ggplot2::element_text(size = 6),
-                       legend.key.size =ggplot2::unit(3,units = "mm"),
+                       legend.title =ggplot2::element_text(size = 8,color = "black") ,
+                       legend.text =ggplot2::element_text(size = 8),
+                       legend.key.size =ggplot2::unit(3.5,units = "mm"),
                        axis.text = ggplot2::element_text(size = 6,color = "black"),
                        axis.text.x =ggplot2::element_blank(),
-                       axis.title = ggplot2::element_text(size = 8,color = "black"))+
+                       axis.title = ggplot2::element_text(size = 10,color = "black"))+
         ggplot2::labs(title ="After ComBat")
 
       original_combat.p<-exp.join.pca+combat.pca

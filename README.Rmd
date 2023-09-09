@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 # oncoClassSurv
 
 <!-- badges: start -->
-[![Lifecycle: stable]] 
+[![Lifecycle: stable]]
 <!-- badges: end -->
 
 ### Introduction
@@ -49,7 +49,8 @@ if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",up
 ### Functions
 The `oncoClassSurv()` provides three optional tasks based on two training and predicting processes: (1) classifier; and (2) survival risk over time. Users can select one task from the three tasks. Among them, `"task=1"` means only calculating the classifications for patients; `"task=2"` means only calculating the survival risk over time for patients; `"task=3"` means calculating the classifications and survival risk over time for patients. When the function of classification is being performed, there are two available machine learning algorithms: random forest (RF) and support vector machine (SVM). Notably, for the prediction of HCC, we found high consistency between the RF and SVM algorithms, and have set the optimal parameter of predicting HCC as the default value of the R package. For other cancers, it is recommended to validate the accuracy and consistency of prediction before conducting large-scale predictions.
 
-In addition, to overcome the tedious steps of programming and make it friendly for ordinary users, we developed an interactive application based on Shiny. Users only need to use the command `oncoClassSurv_RunShiny()` to visit it.
+In addition, to overcome the tedious steps of programming and make it friendly for ordinary users, we developed an 
+interactive application based on Shiny. Users only need to use the command `oncoClassSurv_RunShiny()` to visit it.
 
 
 ### Data prepare
@@ -220,5 +221,5 @@ README-runShinyAPP-demo5_select_sample_gene_heatmap.png
 README-runShinyAPP-demo6_select_samples_survival_and_combat.png
 
 
-Follow us for updates.
+Follow us for updates (https://github.com/OliveryYL/oncoClassSurv).
 

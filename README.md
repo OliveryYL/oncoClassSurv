@@ -1,11 +1,15 @@
+---
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # oncoClassSurv
 
-<!-- badges: start -->
-
-\[\[Lifecycle: stable\]\] <!-- badges: end -->
+<!-- badges: start -->\[\[Lifecycle: stable\]\]<!-- badges: end -->
 
 ### Introduction
 
@@ -58,6 +62,11 @@ default value of the R package. For other cancers, it is recommended to
 validate the accuracy and consistency of prediction before conducting
 large-scale predictions.
 
+In addition, to overcome the tedious steps of programming and make it 
+friendly for ordinary users, we developed an interactive application 
+based on Shiny. Users only need to use the command `oncoClassSurv_RunShiny()` 
+to visit it.
+
 ### Data prepare
 
 The training and input data can all be customized.
@@ -99,7 +108,7 @@ input.tumor.exp[1:6,1:3]
 
 2)  For tables of clinical data, the format could be “.rds” or “.csv”,
     “.txt”, “.xlsx”, etc., which could be imported by the function of
-    `data.table::data.table()`. The first column name should be named
+    `data.table::fread()`. The first column name should be named
     “sample_name”. Additional description for the clinical training
     data: If users need to train a classifier and perform prediction,
     please include the pre-prepared classification information of the
@@ -341,8 +350,8 @@ results$ggsurv.curve$ggsurv.curve$plot
 Run `ShinyAPP` by `oncoClassSurv_RunShiny()`:
 
 ``` r
-# library(oncoClassSurv)
-# oncoClassSurv_RunShiny()
+library(oncoClassSurv)
+oncoClassSurv_RunShiny()
 ```
 
 Description: All `.pdf` or `.csv` files can be downloaded to the local disk.
@@ -370,4 +379,4 @@ Classification table is in the left. Prognosis table is in the right.
 <img src="man/figures/README-runShinyAPP-demo6_select_samples_survival_and_combat.png" width="100%" />
 
 
-Follow us for updates.
+Follow us for updates (https://github.com/OliveryYL/oncoClassSurv).

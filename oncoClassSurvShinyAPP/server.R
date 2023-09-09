@@ -549,8 +549,8 @@ shinyServer(function(input, output,session) {
         names(ann_fillcolors)<-unique(res_class.2$Subtype)
 
         #重设热图基因标签的size，不能过大过小
-        hmp.g.size<-ifelse(120/length(hp_genes)>15,15,
-                           ifelse(120/length(hp_genes)>3,120/length(hp_genes),3))
+        hmp.g.size<-ifelse(150/length(hp_genes)>15,15,
+                           ifelse(150/length(hp_genes)>3,150/length(hp_genes),3))
         #Warning: Error in hclust: 用群集时必需有n >= 2的对象
         cluster_rows<-ifelse(length(hp_genes)>=2, TRUE,FALSE)
 
@@ -772,8 +772,8 @@ shinyServer(function(input, output,session) {
         names(ann_fillcolors)<-unique(res_class.2$Subtype)
 
         #重设热图基因标签的size，不能过大过小
-        hmp.g.size<-ifelse(120/length(hp_genes)>15,15,
-                           ifelse(120/length(hp_genes)>3,120/length(hp_genes),3))
+        hmp.g.size<-ifelse(150/length(hp_genes)>15,15,
+                           ifelse(150/length(hp_genes)>3,150/length(hp_genes),3))
         #Warning: Error in hclust: 用群集时必需有n >= 2的对象
         cluster_rows<-ifelse(length(hp_genes)>=2, TRUE,FALSE)
 

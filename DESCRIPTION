@@ -27,12 +27,9 @@ Imports:
     limma,
     sva,
     magrittr,
-    shiny,
-    ComplexHeatmap,
-    circlize,
-    ggplotify
+    shiny
 Suggests: knitr, rmarkdown, cowplot, ggpubr,
-        tidyr,dplyr
+        tidyr, dplyr, ComplexHeatmap, circlize, ggplotify
 URL: https://github.com/OliveryYL/oncoClassSurv
 BugReports: https://github.com/OliveryYL/oncoClassSurv/issues
 Roxygen: list(markdown = TRUE)

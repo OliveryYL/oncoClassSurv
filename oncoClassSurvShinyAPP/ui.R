@@ -126,7 +126,7 @@ shinyUI(fluidPage(
                             img(src="flowchart_example.svg", height = "40%", width = "100%"),
                             p(span("The usage of parameters is as follows.",style = "color:blue")),
                             img(src="parameter_usage.svg", height = "100%", width = "100%"),
-                            p(span(em("Tips: Save images for higher resolution."),style = "color:red; font-size:12px"))
+                            p(span(em("Claim: For academic research only. Contact us for cooperation."),style = "color:red; font-size:10px"))
                     )
                    )
                  ),

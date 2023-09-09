@@ -1,6 +1,6 @@
 ---
 output:
-  html_document: default(https://github.com/OliveryYL/oncoClassSurv/tree/master/man)
+  html_document: [default](https://github.com/OliveryYL/oncoClassSurv/tree/master/man)
   word_document: default
   pdf_document:
     latex_engine: pdflatex

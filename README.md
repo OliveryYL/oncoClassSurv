@@ -1,15 +1,7 @@
----
-output:
-  html_document: [default](https://github.com/OliveryYL/oncoClassSurv/tree/master/man)
-  word_document: default
-  pdf_document:
-    latex_engine: pdflatex
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # oncoClassSurv
-
+[Download README](https://github.com/OliveryYL/oncoClassSurv/tree/master/man)
 
 ### Introduction
 
@@ -19,7 +11,7 @@ I developed this R package because it will be useful for molecular classificatio
 The current R package involves two main fields: classifier for molecular characteristics, and survival risk over time. The function also provides useful visual output. I also
 noticed that different datasets have batch effects, which increases the difficulty of accurate evaluation. To simplify this process, I optimized the function. When this function 
 is executed, the batch effects between different datasets will be automatically removed. In addition, we initially used this R package for hepatocellular carcinoma (HCC), but
-actually, other kind of tumors or even non-tumor disease can also benefit from it based on the user's customized training data. 
+actually, other kinds of tumors or even non-tumor diseases can also benefit from it based on the user's customized training data. 
 
 The evaluation of tumor molecular classifications is a prerequisite for achieving precise medical management. Based on pre-analyzed or learned sub-types with diverse clinical 
 features (response to drugs, survival outcomes, etc.) and sub-type-specific marker genes, machine learning algorithms could be used for classification training, and thereafter 
@@ -366,7 +358,7 @@ Description: All `.pdf` or `.csv` files can be downloaded to the local disk.
 <img src="man/figures/README-runShinyAPP-demo2_survivalPrediction.png" width="100%" />
 
 4) The output tables. 
-Classification table is in the left. Prognosis table is in the right.
+The classification table is on the left. The prognosis table is on the right.
 <img src="man/figures/README-runShinyAPP-demo3_tables.png" width="100%" />
 
 5) Users can select interesting samples for further research.
@@ -375,7 +367,7 @@ Classification table is in the left. Prognosis table is in the right.
 6) Analyses for curated samples and genes.
 <img src="man/figures/README-runShinyAPP-demo5_select_sample_gene_heatmap.png" width="100%" />
 
-7) Survival curves and the process to remove batch effect.
+7) Survival curves and the process to remove the batch effect.
 <img src="man/figures/README-runShinyAPP-demo6_select_samples_survival_and_combat.png" width="100%" />
 
 

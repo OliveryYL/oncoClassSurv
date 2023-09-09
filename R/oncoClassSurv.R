@@ -3,6 +3,7 @@
 #'Classify tumors into several molecular sub-types using "random forest" or
 #'"support vector machine" according to RNA-Seq data.
 #'Visualization for survival risk based on Cox regression.
+#'
 #' @param exp.type A character for the normalized format of RNA-Seq expression matrix. The default
 #' is "fpkm", and the other option is "tpm". Please use the consistent
 #' "exp.type" in both train expression matrix and input expression matrix.

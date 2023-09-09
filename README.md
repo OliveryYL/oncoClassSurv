@@ -1,15 +1,15 @@
 ---
 output:
-  word_document: default
   html_document: default
-  pdf_document: default
+  word_document: default
+  pdf_document:
+    latex_engine: pdflatex
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # oncoClassSurv
 
-<!-- badges: start -->\[\[Lifecycle: stable\]\]<!-- badges: end -->
 
 ### Introduction
 
@@ -35,14 +35,14 @@ Any questions or tips, please don’t hesitate to let me know!
 ### Installation
 
 1)  Online
-```{r Online installation}
+``` r
 if(!require(devtools))install.packages("devtools")
 if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",upgrade = FALSE,dependencies = TRUE)
 ```
 2)  Local
-```{r Local installation}
+``` r
 #Click the green button "code" on this page, then click "Download ZIP" to download it to your R working directory. Install it with:
-#devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)
+devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)
 ```
 
 ### Functions

@@ -27,6 +27,7 @@
 #' #Perform an interactive operation:
 #' oncoClassSurv_RunShiny()
 #' }
+
 oncoClassSurv_RunShiny<-function(){
   shiny::runApp("./oncoClassSurvShinyAPP",display.mode = "auto")
 }

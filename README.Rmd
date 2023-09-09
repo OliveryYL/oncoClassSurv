@@ -14,9 +14,6 @@ knitr::opts_chunk$set(
 
 # oncoClassSurv
 
-<!-- badges: start -->
-[![Lifecycle: stable]]
-<!-- badges: end -->
 
 ### Introduction
 
@@ -34,15 +31,15 @@ Any questions or tips, please don't hesitate to let me know!
 
 1.  Online
 
-```{r Online installation}
+```{r Online_installation}
 if(!require(devtools))install.packages("devtools")
 if(!require(oncoClassSurv))devtools::install_github("OliveryYL/oncoClassSurv",upgrade = FALSE,dependencies = TRUE)
 ```
 
 2. Local
-```{r Local installation}
+```{r Local_installation}
 #Click the green button "code" on this page, then click "Download ZIP" to download it to your R working directory. Install it with:
-#devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)
+devtools::install_local("oncoClassSurv-master.zip",upgrade = F,dependencies = T)
 ```
 
 
@@ -192,8 +189,8 @@ results$ggsurv.curve$ggsurv.curve$plot
 Run `ShinyAPP` by `oncoClassSurv_RunShiny()`:
 
 ```{r runShiny}
-# library(oncoClassSurv)
-# oncoClassSurv_RunShiny()
+library(oncoClassSurv)
+oncoClassSurv_RunShiny()
 ```
 
 Description: All `.pdf` or `.csv` files can be downloaded to the local disk.

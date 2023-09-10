@@ -370,5 +370,5 @@ The classification table is on the left. The prognosis table is on the right.
 7) Survival curves and the process to remove the batch effect.
 <img src="man/figures/README-runShinyAPP-demo6_select_samples_survival_and_combat.png" width="100%" />
 
-
+The online version of oncoClassSurv ShinyAPP (https://oncomanager.shinyapps.io/oncoClassSurv/).
 Follow us for updates (https://github.com/OliveryYL/oncoClassSurv).

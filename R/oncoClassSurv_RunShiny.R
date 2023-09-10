@@ -29,5 +29,5 @@
 #' }
 
 oncoClassSurv_RunShiny<-function(){
-  shiny::runApp("./oncoClassSurvShinyAPP",display.mode = "auto")
+  shiny::runApp(system.file("oncoClassSurvShinyAPP",package = "oncoClassSurv"),display.mode = "auto")
 }

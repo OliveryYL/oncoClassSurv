@@ -1,0 +1,14 @@
+bibentry(
+  bibtype = "Article",
+  textVersion = "Yang Li. Multidimensional molecular feature scoring reveals subtyping of hepatocellular carcinoma, 2023.",
+  header = "To cite oncoClassSurv in publications, please use",
+  author = "Yang Li",
+  title = "oncoClassSurv: Predict classifications and survival risk",
+  journal = "To be published",
+  year = "2023",
+  volume = "To be published",
+  number = "To be published",
+  pages = "To be published",
+  doi = "To be published",
+  url = "https://github.com/OliveryYL/oncoClassSurv"
+)

@@ -26,10 +26,12 @@ Imports:
     BiocManager,
     limma,
     sva,
+    caret,
+    dplyr,
     magrittr,
     shiny
 Suggests: knitr, rmarkdown, cowplot, ggpubr,
-        tidyr, dplyr, ComplexHeatmap, circlize, ggplotify
+        tidyr, ComplexHeatmap, circlize, ggplotify
 URL: https://github.com/OliveryYL/oncoClassSurv
 Year: 2023
 BugReports: https://github.com/OliveryYL/oncoClassSurv/issues

@@ -16,6 +16,11 @@ oncoClassSurv(
   train_survival.feature.path = NULL,
   input.exp.path,
   input.clin.path = NULL,
+  train.exp.limma.normlize = FALSE,
+  input.exp.limma.normlize = FALSE,
+  random.sample.train = FALSE,
+  train.seeds = 1234,
+  random.prob = 0.7,
   miss_go.on = TRUE,
   rm.batch.effect = TRUE,
   task = 3,
@@ -76,6 +81,26 @@ cohort.}
 including additional clinical variables (e.g. tumor stage, age, gender, etc.),
 when prediction for the survival risk of input data needs to be performed.
 The default value is null.}
+
+\item{train.exp.limma.normlize}{Logical value. Whether to normalize the RNA-Seq expression profile of the
+training cohort using \code{limma::\link{normalizeBetweenArrays}}. If the
+expression profile has not been normalized, select TRUE. The default value is
+FALSE.}
+
+\item{input.exp.limma.normlize}{Logical value. Whether to normalize the RNA-Seq expression profile of the
+user's input cohort using \code{limma::\link{normalizeBetweenArrays}}. If the
+expression profile has not been normalized, select TRUE. The default value is
+FALSE.}
+
+\item{random.sample.train}{Logical value. Whether to fit the model based on randomized sampling in the
+training cohort. The default value is FALSE. Detailed information can be seen
+in \code{caret::\link{createDataPartition}}.}
+
+\item{train.seeds}{A number. If the random.sample.train is TRUE, users can use a random seed to
+control the results of random sampling. The default value is 1234.}
+
+\item{random.prob}{A number from 0 to 1. Probability of sampling. The default value is 0.7.
+Details can be seen in \code{caret::\link{createDataPartition}}.}
 
 \item{miss_go.on}{Logical value. The function will automatically check whether missing genes
 exist in the user's input expression matrix. If there are missing genes,
@@ -203,6 +228,7 @@ show.message=FALSE)
 }
 \seealso{
 \code{sva::\link{ComBat}};
+\code{limma::\link{normalizeBetweenArrays}};
 \code{randomForest::\link{randomForest}};
 \code{e1071::\link{svm}};
 \code{survminer::\link{ggsurvplot}}

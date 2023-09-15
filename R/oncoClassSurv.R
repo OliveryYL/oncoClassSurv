@@ -33,6 +33,14 @@
 #' including additional clinical variables (e.g. tumor stage, age, gender, etc.),
 #' when prediction for the survival risk of input data needs to be performed.
 #' The default value is null.
+#' @param train.exp.limma.normlize Logical value. Whether to normalize the RNA-Seq expression profile of the
+#' training cohort using \code{limma::\link{normalizeBetweenArrays}}. If the
+#' expression profile has not been normalized, select TRUE. The default value is
+#' FALSE.
+#' @param input.exp.limma.normlize Logical value. Whether to normalize the RNA-Seq expression profile of the
+#' user's input cohort using \code{limma::\link{normalizeBetweenArrays}}. If the
+#' expression profile has not been normalized, select TRUE. The default value is
+#' FALSE.
 #' @param miss_go.on Logical value. The function will automatically check whether missing genes
 #' exist in the user's input expression matrix. If there are missing genes,
 #' selecting "TRUE" means using the common genes (the training expression
@@ -46,6 +54,13 @@
 #' comparison results. Using the principal component analysis. The default value is FALSE.
 #' @param print.combat.plots Logical value. After removing the batch effects, visualize the comparison
 #' results in the current graph panel. This item works when the item of "plot.combatch" is TRUE.
+#' @param random.sample.train Logical value. Whether to fit the model based on randomized sampling in the
+#' training cohort. The default value is FALSE. Detailed information can be seen
+#' in \code{caret::\link{createDataPartition}}.
+#' @param train.seeds A number. If the random.sample.train is TRUE, users can use a random seed to
+#' control the results of random sampling. The default value is 1234.
+#' @param random.prob A number from 0 to 1. Probability of sampling. The default value is 0.7.
+#' Details can be seen in \code{caret::\link{createDataPartition}}.
 #' @param cluster.method A character indicating the algorithm used in the prediction for classification.
 #' Optional values include "RF" (random forest) and "SVM" (support vector machine).
 #' @param nodesize A parameter in the random forest. Details can be seen in
@@ -93,7 +108,10 @@
 #' @importFrom stats prcomp
 #' @importFrom stats as.formula
 #' @importFrom stats predict
+#' @importFrom stats complete.cases
 #' @importFrom randomForest randomForest
+#' @importFrom caret createDataPartition
+#' @importFrom dplyr inner_join
 #' @import e1071
 #' @import ggplot2
 #' @import ggfortify
@@ -150,6 +168,7 @@
 #' }
 ##' @seealso
 ##' \code{sva::\link{ComBat}};
+##' \code{limma::\link{normalizeBetweenArrays}};
 ##' \code{randomForest::\link{randomForest}};
 ##' \code{e1071::\link{svm}};
 ##' \code{survminer::\link{ggsurvplot}}
@@ -163,6 +182,11 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
                                                                package = "oncoClassSurv"),
                         train_survival.feature.path=NULL,
                         input.exp.path,input.clin.path=NULL,
+                        train.exp.limma.normlize=FALSE,
+                        input.exp.limma.normlize=FALSE,
+                        random.sample.train=FALSE,
+                        train.seeds=1234,
+                        random.prob=0.7,
                         miss_go.on=TRUE,rm.batch.effect=TRUE,
                         task=3,plot.combatch=FALSE,
                         print.combat.plots=FALSE,
@@ -217,26 +241,25 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     }else{
       cluster_markergenes<-data.table::fread(train_cluster.feature.path,data.table = F)[,1]
     }
+
     cluster_markergenes<-gsub(cluster_markergenes,pattern="-",replacement="_")
 
     #根据要执行的操作，check是否包含classifier模型所需要的基因？
     None.feature<-cluster_markergenes[!cluster_markergenes%in%rownames(input.tumor.exp)]
     if(length(None.feature)>0){
       if(miss_go.on){
-        if(show.message){
-          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
-                         "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
-                         ", but ",nrow(input.tumor.exp)," in your input data."))
-          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
-        }
+        no.cluster.marker=length(cluster_markergenes)
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
-        train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
-
         col.label<-colnames(input.tumor.exp)
-        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]%>%as.data.frame()
-        colnames(input.tumor.exp)<-col.label
-        rownames(input.tumor.exp)<-cluster_markergenes
+
+        if(show.message){
+          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
+                         "\nNumber of Marker features in the train data: ",no.cluster.marker,
+                         ", but ",length(cluster_markergenes)," in your input data."))
+          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        }
+
 
 
       }else{
@@ -251,15 +274,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       prog.signif.features<-data.table::fread(train_survival.feature.path,data.table = F)[,1]
     }
     prog.signif.features<-gsub(prog.signif.features,pattern="-",replacement="_")
-    #保留表达谱文件中的共同基因
-    co_genes<-base::intersect(rownames(train.tumor.exp),rownames(input.tumor.exp))
-    train.tumor.exp<-train.tumor.exp[co_genes,]
-
     col.label<-colnames(input.tumor.exp)
-    input.tumor.exp<-input.tumor.exp[co_genes,]%>%as.data.frame()
-    colnames(input.tumor.exp)<-col.label
-    rownames(input.tumor.exp)<-co_genes
-
   }
   if(task==3){
     if(grepl(x=train_cluster.feature.path,pattern = "\\.rds$")){
@@ -282,22 +297,16 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     None.feature<-cluster_markergenes[!cluster_markergenes%in%rownames(input.tumor.exp)]
     if(length(None.feature)>0){
       if(miss_go.on){
-        if(show.message){
-          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
-                         "\nNumber of Marker features in the train data: ",length(cluster_markergenes),
-                         ", but ",nrow(input.tumor.exp)," in your input data."))
-          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
-        }
+        no.cluster.marker=length(cluster_markergenes)
         #最后，选择cluster_markergenes与input的共同基因用于后续分型
         cluster_markergenes<-base::intersect(cluster_markergenes,rownames(input.tumor.exp))
-        train.tumor.exp<-train.tumor.exp[cluster_markergenes,]
-
-
         col.label<-colnames(input.tumor.exp)
-        input.tumor.exp<-input.tumor.exp[cluster_markergenes,]%>%as.data.frame()
-        colnames(input.tumor.exp)<-col.label
-        rownames(input.tumor.exp)<-cluster_markergenes
-
+        if(show.message){
+          message(paste0("\nPlease check your input features!\nNotice: Default option is to continue when missing features exist in the input data, which may cause reduced accuracy.",
+                         "\nNumber of Marker features in the train data: ",no.cluster.marker,
+                         ", but ",length(cluster_markergenes)," in your input data."))
+          message(paste0("\nMissing features: ",paste0(None.feature,collapse = ",")))
+        }
       }else{
         stop("Need complete input file including all essential features.")
       }
@@ -306,14 +315,35 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
 
   #5.标准化####
   #5.1使用limma去重基因，平均，标准化
-  input.tumor.exp=as.matrix(input.tumor.exp)
-  input.tumor.exp=limma::avereps(input.tumor.exp)
-  #limma包标准化函数normalizeBetweenArrays()
-  input.tumor.exp <- limma::normalizeBetweenArrays(input.tumor.exp)
-  #5.2是否已经进行log2(FPKM+1)？若无，需要对表达谱进行log2(FPKM+1)转化
-  #如果max(x)>50,警告，需要FPKM数据，请user检查数据！！
-  #log2(fpkm+1)
-  train.tumor.exp<-log2(train.tumor.exp+1)
+  if(train.exp.limma.normlize){
+    train.tumor.exp=as.matrix(train.tumor.exp)
+    train.tumor.exp=limma::avereps(train.tumor.exp)
+    #limma包标准化函数normalizeBetweenArrays()
+    train.tumor.exp <- limma::normalizeBetweenArrays(train.tumor.exp)
+  }
+
+
+  if(input.exp.limma.normlize){
+    input.tumor.exp=as.matrix(input.tumor.exp)
+    input.tumor.exp=limma::avereps(input.tumor.exp)
+    #limma包标准化函数normalizeBetweenArrays()
+    input.tumor.exp <- limma::normalizeBetweenArrays(input.tumor.exp)
+  }
+
+
+  #5.2是否已经进行log2(expression+1)？
+  #此处根据expressioin的分布范围进行自动判断。若未进行log2转换，则需对表达谱进行log2(expression+1)转化
+  if(min(train.tumor.exp)>=0){
+    if(max(train.tumor.exp)>50){
+      message("Train data is performing log2(expression+1)...")
+      train.tumor.exp<-log2(train.tumor.exp+1)
+      message("log2(expression+1) finished.")
+    }
+  }else{
+    Neg.expression.warning<-"Please check if the train expression data has undergone logarithmic conversion, as there are negative values in it."
+    warning(Neg.expression.warning)
+    return.list[["Train.Neg.expression.warning"]]<-Neg.expression.warning
+  }
 
   if(min(input.tumor.exp)>=0){
     if(max(input.tumor.exp)>50){
@@ -324,23 +354,30 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
   }else{
     Neg.expression.warning<-"Please check if the input expression data has undergone logarithmic conversion, as there are negative values in it."
     warning(Neg.expression.warning)
-    return.list[["Neg.expression.warning"]]<-Neg.expression.warning
+    return.list[["Input.Neg.expression.warning"]]<-Neg.expression.warning
   }
 
   #6.选择是否进行combat()####
   if(rm.batch.effect){
 
-    input.tumor.exp.1<-input.tumor.exp[rownames(train.tumor.exp),]%>%as.data.frame()
-    colnames(input.tumor.exp.1)<-col.label
-    rownames(input.tumor.exp.1)<-rownames(train.tumor.exp)
+    train.tumor.exp1<-train.tumor.exp%>%tibble::rownames_to_column(var = gene.col.label)
+    input.tumor.exp1<-input.tumor.exp%>%tibble::rownames_to_column(var = gene.col.label)
+    exp.list<-list(TCGA=train.tumor.exp1,
+                   ICGC=input.tumor.exp1)
+    in_join<-function(x,y){
+      dplyr::inner_join(x,y,by=gene.col.label)
+    }
+    exp.join<-Reduce(in_join,exp.list)
+    exp.join<-exp.join%>%tibble::column_to_rownames(var = gene.col.label)
+    exp.join<-exp.join[stats::complete.cases(exp.join),]
 
-    exp.join<-cbind(train.tumor.exp,input.tumor.exp.1)
     Batch<-base::rep(c("Train","Input"),c(dim(train.tumor.exp)[2],dim(input.tumor.exp)[2]))
     Batch<-factor(Batch,levels = c("Train","Input"))
 
     #library(sva)
+    message("Combatch start...")
     batchremove_combat <- sva::ComBat(dat = as.matrix(exp.join), batch = Batch)
-
+    message("Combatch finished.")
     if(plot.combatch){
       #library(ggfortify)
       exp.join.dt <- as.data.frame(t(exp.join))
@@ -432,7 +469,18 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     }
   }
 
-
+  #是否随机抽取训练集中的一部分进行训练建模？
+  if(task%in%c(1,3)&random.sample.train){
+    #tcga数据拆分
+    train.tumor.dt$Cluster<-factor(train.tumor.dt$Cluster)
+    set.seed(train.seeds)
+    trains <- caret::createDataPartition(
+      y =train.tumor.dt$Cluster,#对于分类型因变量
+      p=random.prob,
+      list=FALSE)
+    train.tumor.dt <- train.tumor.dt[trains,]
+    return.list[["TrainRandomSampling"]]<-table(train.tumor.dt$Cluster)
+  }
 
   #choose task and perform that#
   if(task==1){
@@ -441,8 +489,8 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       paste0("Cluster ~ ",paste0("`", cluster_markergenes ,"`", collapse = " + ")))
 
     if(cluster.method=="RF"){
-      #library(randomForest)
       # 构建RF模型
+      message("Fitting the random forest model...")
       set.seed(1234) # 保证结果的可重复性
       RF.fit<- randomForest::randomForest(
         cluster.fmla,
@@ -450,8 +498,9 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
         data = train.tumor.dt,
         ntree = ntree, # 决策树棵数
         mtry = mtry, # 每个节点可供选择的变量数目
-        importance = importance # 输出变量重要性
+        importance =importance # 输出变量重要性
       )
+      message("Predicting by the random forest...")
       #预测
       rf.cluster.pred <- stats::predict(RF.fit,newdata = input.tumor.exp,type = "class")
       rf.cluster.pred.dt<-data.frame(ID=names(rf.cluster.pred),rf.cluster.pred)
@@ -461,8 +510,10 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       if(cluster.method=="SVM"){
         #library(e1071)
         #构建SVM模型
+        message("Fitting the support vector machine model...")
         SVM.fit.r <- e1071::svm(cluster.fmla, data=train.tumor.dt,kernel=kernel,cost=cost)
         #预测
+        message("Predicting by the support vector machine...")
         svm.cluster.pred <- stats::predict(SVM.fit.r,newdata = input.tumor.exp,type = "class")
         svm.cluster.pred.dt<-data.frame(ID=names(svm.cluster.pred),svm.cluster.pred)
         return.list[["svm.cluster"]]<-list(cluster.method=cluster.method,
@@ -475,15 +526,14 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     surv.fmla <- stats::as.formula(
       paste0("Surv(",time,",","status==", event,") ~",paste0("`",prog.signif.features ,"`", collapse = " + ")))
     #构建coxphfit模型
+    message("Fitting the prognostic model...")
     train.coxfit<-survival::coxph(surv.fmla,data = train.tumor.dt)
-
     #预测生存曲线
+    message("Prognostic prediction...")
     input.surv.curve<-survival::survfit(train.coxfit,newdata = input.tumor.dt)
-
     #根据生存曲线计算生存概率
     input.surv.probablity=data.frame(Time=summary(input.surv.curve)$time,
                                      SurvivalProbablity=summary(input.surv.curve)$surv)
-
     return.list[["surv.probablity"]]<-input.surv.probablity
 
     #自定义时间点####
@@ -541,6 +591,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     if(cluster.method=="RF"){
       #library(randomForest)
       # 构建RF模型
+      message("Fitting the random forest model...")
       set.seed(1234) # 保证结果的可重复性
       RF.fit<- randomForest::randomForest(
         cluster.fmla,
@@ -551,6 +602,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
         importance = importance # 输出变量重要性
       )
       #预测
+      message("Predicting by the random forest...")
       rf.cluster.pred <- stats::predict(RF.fit,newdata = input.tumor.exp,type = "class")
       rf.cluster.pred.dt<-data.frame(ID=names(rf.cluster.pred),rf.cluster.pred)
       return.list[["rf.cluster"]]<-list(cluster.method=cluster.method,
@@ -559,8 +611,10 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       if(cluster.method=="SVM"){
         #library(e1071)
         #构建SVM模型
+        message("Fitting the support vector machine model...")
         SVM.fit.r <- e1071::svm(cluster.fmla, data=train.tumor.dt,kernel=kernel,cost=cost)
         #预测
+        message("Predicting by the support vector machine...")
         svm.cluster.pred <- stats::predict(SVM.fit.r,newdata = input.tumor.exp,type = "class")
         svm.cluster.pred.dt<-data.frame(ID=names(svm.cluster.pred),svm.cluster.pred)
         return.list[["svm.cluster"]]<-list(cluster.method=cluster.method,
@@ -572,8 +626,10 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     surv.fmla <- stats::as.formula(
       paste0("Surv(",time,",","status==", event,") ~",paste0("`",prog.signif.features ,"`", collapse = " + ")))
     #构建coxphfit模型
+    message("Fitting the prognostic model...")
     train.coxfit<-survival::coxph(surv.fmla,data = train.tumor.dt)
     #预测生存曲线
+    message("Prognostic prediction...")
     input.surv.curve<-survival::survfit(train.coxfit,newdata = input.tumor.dt)
     #根据生存曲线计算生存概率
     input.surv.probablity=data.frame(Time=summary(input.surv.curve)$time,

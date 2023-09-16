@@ -157,7 +157,7 @@ tags$script(HTML("
                             p(span("The flowchart and examples are as follows.",style = "color:blue")),
                             img(src="flowchart_example.png", height = "40%", width = "100%"),
                             p(span("The usage of parameters is as follows.",style = "color:blue")),
-                            img(src="parameter_usage.svg", height = "100%", width = "100%"),
+                            img(src="parameter_usage.png", height = "100%", width = "100%"),
                             p(span(em("Claim: For academic research only. Contact us for cooperation."),style = "color:red; font-size:10px")),
                             br(),
                             p("The ",span("oncoClassSurv", style = "color:blue"),"application is based on the R package called",

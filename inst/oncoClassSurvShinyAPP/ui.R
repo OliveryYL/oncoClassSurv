@@ -9,7 +9,6 @@ jsResetCode <- "shinyjs.resetPage = function() {history.go(0)}"
 
 shinyUI(fluidPage(
   theme = shinythemes::shinytheme("cerulean"),#superhero,united,cerulean,...
-  #shinythemes::themeSelector(),
   #使用themeSelector自定义主题风格
   tags$div(id = "selector", shinythemes::themeSelector()),
   #自定义的CSS样式，用来设置下拉框的初始状态为隐藏，并且设置一个类名，例如"show"，用来表示下拉框的显示状态
@@ -152,7 +151,11 @@ tags$script(HTML("
                                                   style="color: red; background-color: #337ab7;
                                          border-color: #2e6da4")
                             ),
-
+                   tabPanel("Theme",
+                            p(span(em("Click the button below to switch your favorite theme style."),style = "color:black; font-size:16px")),
+                            br(),
+                            br(),
+                            actionButton("toggle", "Show/Hide Theme Selector")),
                    tabPanel("Usage",
                             p(span("The flowchart and examples are as follows.",style = "color:blue")),
                             img(src="flowchart_example.png", height = "40%", width = "100%"),
@@ -165,12 +168,7 @@ tags$script(HTML("
                               ' so you can visit the ',
                               a("GitHub repository",
                                 href = "https://github.com/OliveryYL/oncoClassSurv")," for more information.")
-                    ),
-                   tabPanel("Theme",
-                            p(span(em("Click the button below to switch your favorite theme style."),style = "color:black; font-size:16px")),
-                            br(),
-                            br(),
-                            actionButton("toggle", "Show/Hide Theme Selector"))
+                   )
                    )
                  ),
     mainPanel(

@@ -458,7 +458,6 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       PartSamples.Pred<-data.table::fread(PartSamples.Pred.Path,data.table = F,header = F)[,1]
       input.tumor.exp<-input.tumor.exp[PartSamples.Pred,]
     }
-
     if(task%in%c(2,3)&!is.null(input.clin.path)){
       input.tumor.dt<-cbind(input.clinsurv[rownames(input.tumor.exp),],input.tumor.exp)
     }else{if(task%in%c(2,3)){
@@ -485,6 +484,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     }
     }
   }
+
 
   #是否随机抽取训练集中的一部分进行训练建模？
   if(task%in%c(1,3)&random.sample.train){
@@ -548,6 +548,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     train.coxfit<-survival::coxph(surv.fmla,data = train.tumor.dt)
     #预测生存曲线
     message("Prognostic prediction...")
+
     input.surv.curve<-survival::survfit(train.coxfit,newdata = input.tumor.dt)
     #根据生存曲线计算生存概率
     input.surv.probablity=data.frame(Time=summary(input.surv.curve)$time,
@@ -577,11 +578,12 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
       if(length(plot.samples)>50){
         gg.legend.position="none"
       }
-
       if(!is.null(survtime.unit)){survtime.axis=
         paste0("Time ","(",survtime.unit,")")}else{
           survtime.axis="Time"
         }
+      plot.samples<-intersect(1:dim(input.tumor.dt)[1],plot.samples)
+
       input.ggsurv.curve<-survminer::ggsurvplot(input.surv.curve[plot.samples],data =input.tumor.dt,
                                                 fun = "pct",conf.int = F,surv.median.line = "hv",
                                                 legend.title="Sample",legend=gg.legend.position,
@@ -682,6 +684,8 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
         paste0("Time ","(",survtime.unit,")")}else{
           survtime.axis="Time"
         }
+      plot.samples<-intersect(1:dim(input.tumor.dt)[1],plot.samples)
+
       input.ggsurv.curve<-survminer::ggsurvplot(input.surv.curve[plot.samples],data =input.tumor.dt,
                                                 fun = "pct",conf.int = F,surv.median.line = "hv",
                                                 break.x.by = survcurve.break.x.by,

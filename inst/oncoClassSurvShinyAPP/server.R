@@ -75,39 +75,56 @@ shinyServer(function(input, output,session) {
   #11. survcurve.break.x.by
   survcurve.break.x.by.active<-eventReactive(input$run,{input$survcurve.break.x.by})
 
-  #12. 根据update.surv, 刷新plot.samples 获取选择器输入框的值
+  #12. file.PartSamples.Pred Whether to select parts of samples to perform prediction analysis
+  file.PartSamples.Pred.path1<-eventReactive(input$run,{input$file.PartSamples.Pred$datapath})
+
+  #13. 根据update.surv, 刷新plot.samples 获取选择器输入框的值
   #plot.samples.active=NULL
   plot.samples.active <- eventReactive(input$run,{input$plot.samples})
 
-  #13. legend.size
+  #14. legend.size
   leg.size.active <- eventReactive(input$run,{input$leg.size})
 
-  #14. sel.geneset #勾选基因集
+  #15. sel.geneset #勾选基因集
   sel.geneset.active <- eventReactive(input$run,{input$sel.geneset})
 
-  #15. selgene.uplod #fileinput基因集
+  #16. selgene.uplod #fileinput基因集
   selgene.uplod.active <- eventReactive(input$run,{
     data.table::fread(input$selgene.uplod$datapath,
                       data.table = F,header = F)[,1]})
 
-  #16. text.input.gene.explore #输入text兴趣基因
+  #17. text.input.gene.explore #输入text兴趣基因
   text.input.gene.explore.active <- eventReactive(input$run,{
     text.genes<-strsplit(x=input$text.input.gene.explore,split = ",|，|;| ")[[1]]
     text.genes<-text.genes[which(text.genes!="")]
     text.genes
     })
 
-  #17. select.hp.gene #选择哪个输入组的基因呢？
+  #18. select.hp.gene #选择哪个输入组的基因呢？
   select.hp.gene.active <- eventReactive(input$run,{
     input$select.hp.gene
   })
 
-  #18. survtime.unit #输入生存曲线时间单位
+  #19. survtime.unit #输入生存曲线时间单位
   survtime.unit.active <- eventReactive(input$run,{input$survtime.unit})
 
-  #19. hp.sample #热图是否选择sample进行绘制，是否显示sample名称
+  #20. hp.sample #热图是否选择sample进行绘制，是否显示sample名称
   hp.sample.active<-eventReactive(input$run,{input$hp.sample})
 
+  #21. limmaNorm.train Whether to perform limma::normalizeBetweenArrays()in the train cohort.
+  limmaNorm.train.active<-eventReactive(input$run,{input$limmaNorm.train})
+
+  #22. limmaNorm.input Whether to perform limma::normalizeBetweenArrays()in the input cohort.
+  limmaNorm.input.active<-eventReactive(input$run,{input$limmaNorm.input})
+
+  #23. RandomSamTrain Whether to use random samples to fit training models in the training cohort.
+  RandomSamTrain.active<-eventReactive(input$run,{input$RandomSamTrain})
+
+  #24. TrainSeed If RandomSamTrain is TRUE, use a random seed to control the results of random sampling.
+  TrainSeed.active<-eventReactive(input$run,{input$TrainSeed})
+
+  #25. SamplingProb If RandomSamTrain is TRUE, provide a sampling probability. From 0.01 to 1
+  SamplingProb.active<-eventReactive(input$run,{input$SamplingProb})
 
   #save reactive values: Use reactiveValues to store the reactive value
   actvalue <- reactiveValues(path = NULL)
@@ -268,12 +285,26 @@ shinyServer(function(input, output,session) {
         actvalue$survcurve.break.x.by<-12
       }
 
-      #12. plot.samples 获取选择器输入框的值
+      #12. file.PartSamples.Pred Whether to select parts of samples to perform prediction analysis
+      if(!is.null(input$file.PartSamples.Pred)){
+        actvalue$PartSamples.Pred.Path<-file.PartSamples.Pred.path1()
+      }else{
+          actvalue$PartSamples.Pred.Path<-NULL
+      }
+
+      #13. plot.samples 获取选择器输入框的值
       input.tumor.exp<-data.table::fread(file = actvalue$input.exp.path,
                                       data.table = F,showProgress = T)
       gene.column.guess<-grep(x=colnames(input.tumor.exp),pattern = "gene|feature|symbol",
            ignore.case = T,value = T)
       input.tumor.exp<-input.tumor.exp%>%tibble::column_to_rownames(var = gene.column.guess)
+
+      #如果只分析部分samples，则需要进一步添加筛选条件：
+      if(!is.null(input$file.PartSamples.Pred)){
+        PartSamples.Pred<-data.table::fread(actvalue$PartSamples.Pred.Path,
+                                            data.table = F,header = F)[,1]
+        input.tumor.exp<-input.tumor.exp[PartSamples.Pred]
+      }
 
       #如果只输入了3个样本，则不能选择绘制1:10个样本的生存曲线，所以需要使用head(1:num.max,10)
       num.max <- dim(input.tumor.exp)[2]
@@ -288,31 +319,31 @@ shinyServer(function(input, output,session) {
         actvalue$plot.samples<-head(1:num.max,10)
       }
 
-      # 13. legend.size
+      # 14. legend.size
       actvalue$leg.size<-leg.size.active()
 
-      #14. sel.geneset #勾选基因集
+      #15. sel.geneset #勾选基因集
       if(!is.null(sel.geneset.active())){
         actvalue$sel.geneset<-sel.geneset.active()
       }else{
         actvalue$sel.geneset<-"2"#默认为"2":Immunegene
       }
 
-      #15. selgene.uplod #fileinput基因集
+      #16. selgene.uplod #fileinput基因集
       if(!is.null(input$selgene.uplod)){
         actvalue$selgene.uplod<-selgene.uplod.active()
       }else{
         actvalue$selgene.uplod<-NULL
       }
 
-      #16. text.input.gene.explore #输入text兴趣基因
+      #17. text.input.gene.explore #输入text兴趣基因
       if(!is.null(text.input.gene.explore.active())&length(text.input.gene.explore.active())>0){
         actvalue$text.input.gene.explore<-text.input.gene.explore.active()
       }else{
         actvalue$text.input.gene.explore<-NULL
       }
 
-      #17. select.hp.gene
+      #18. select.hp.gene
       select.hp.gene.active
       if(!is.null(select.hp.gene.active())){
         actvalue$select.hp.gene<-select.hp.gene.active()
@@ -321,20 +352,56 @@ shinyServer(function(input, output,session) {
       }
 
 
-      #18. survtime.unit #输入生存曲线时间单位
+      #19. survtime.unit #输入生存曲线时间单位
       if(!is.null(survtime.unit.active())){
         actvalue$survtime.unit<-survtime.unit.active()
       }else{
         actvalue$survtime.unit<-"months"
       }
 
-      #19. hp.sample #热图是否选择sample进行绘制，是否显示sample名称
+      #20. hp.sample #热图是否选择sample进行绘制，是否显示sample名称
       if(!is.null(hp.sample.active())){
         actvalue$hp.sample<-hp.sample.active()
       }else{
         actvalue$hp.sample<-NULL
       }
 
+      #21. limmaNorm.train Whether to perform limma::normalizeBetweenArrays()in the train cohort.
+      if(!is.null(limmaNorm.train.active())){
+        actvalue$train.exp.limma.normlize<-ifelse(limmaNorm.train.active()=="1",TRUE,FALSE)
+      }else{
+        actvalue$train.exp.limma.normlize<-FALSE
+      }
+
+      #22. limmaNorm.input Whether to perform limma::normalizeBetweenArrays()in the input cohort.
+      if(!is.null(limmaNorm.input.active())){
+        actvalue$input.exp.limma.normlize<-ifelse(limmaNorm.input.active()=="1",TRUE,FALSE)
+      }else{
+        actvalue$input.exp.limma.normlize<-FALSE
+      }
+
+
+      #23. RandomSamTrain Whether to use random samples to fit training models in the training cohort.
+      if(!is.null(RandomSamTrain.active())){
+        actvalue$RandomSamTrain<-ifelse(RandomSamTrain.active()=="1",TRUE,FALSE)
+      }else{
+        actvalue$RandomSamTrain<-FALSE
+      }
+
+      #24. TrainSeed If RandomSamTrain is TRUE, use a random seed to control the results of random sampling.
+      if(!is.null(TrainSeed.active())){
+        actvalue$TrainSeed<-TrainSeed.active()
+      }else{
+        actvalue$TrainSeed<-1234
+      }
+
+      #25. SamplingProb If RandomSamTrain is TRUE, provide a sampling probability. From 0.01 to 1
+      SamplingProb.active<-eventReactive(input$run,{input$SamplingProb})
+      if(!is.null(SamplingProb.active())){
+        actvalue$SamplingProb<-SamplingProb.active()
+      }else{
+        actvalue$SamplingProb<-0.7
+      }
 
       #perform the main program####
       actvalue$results<-oncoClassSurv(
@@ -349,6 +416,14 @@ shinyServer(function(input, output,session) {
         rm.batch.effect=actvalue$rm.batch.effect,
         plot.combatch=actvalue$plot.combatch,
         cluster.method=actvalue$cluster.method,
+
+        train.exp.limma.normlize =actvalue$train.exp.limma.normlize ,
+        input.exp.limma.normlize =actvalue$input.exp.limma.normlize,
+
+        random.sample.train=actvalue$RandomSamTrain,
+        train.seeds=actvalue$TrainSeed,
+        random.prob=actvalue$SamplingProb,
+        PartSamples.Pred.Path=actvalue$PartSamples.Pred.Path,
 
         kernel = actvalue$kernel,
         cost = actvalue$cost,
@@ -468,7 +543,6 @@ shinyServer(function(input, output,session) {
 
         #显示通知信息3：
         if(actvalue$select.hp.gene=="3"&is.null(actvalue$text.input.gene.explore)){
-          print("X10")
           showNotification("No gene input! Use default gene set.", duration = 5,type = c("warning"))
         }
         #显示通知信息4：
@@ -692,7 +766,6 @@ shinyServer(function(input, output,session) {
 
         #显示通知信息3：
         if(actvalue$select.hp.gene=="3"&is.null(actvalue$text.input.gene.explore)){
-          print("X10")
           showNotification("No gene input! Use default gene set.", duration = 5,type = c("warning"))
         }
         #显示通知信息4：

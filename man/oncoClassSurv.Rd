@@ -21,6 +21,7 @@ oncoClassSurv(
   random.sample.train = FALSE,
   train.seeds = 1234,
   random.prob = 0.7,
+  PartSamples.Pred.Path = NULL,
   miss_go.on = TRUE,
   rm.batch.effect = TRUE,
   task = 3,
@@ -101,6 +102,10 @@ control the results of random sampling. The default value is 1234.}
 
 \item{random.prob}{A number from 0 to 1. Probability of sampling. The default value is 0.7.
 Details can be seen in \code{caret::\link{createDataPartition}}.}
+
+\item{PartSamples.Pred.Path}{The path of the table file. If the user wishes to predict parts of all samples,
+they can prepare a table file containing the names of selected samples (without
+column names).}
 
 \item{miss_go.on}{Logical value. The function will automatically check whether missing genes
 exist in the user's input expression matrix. If there are missing genes,

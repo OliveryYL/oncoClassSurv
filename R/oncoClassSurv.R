@@ -61,6 +61,9 @@
 #' control the results of random sampling. The default value is 1234.
 #' @param random.prob A number from 0 to 1. Probability of sampling. The default value is 0.7.
 #' Details can be seen in \code{caret::\link{createDataPartition}}.
+#' @param PartSamples.Pred.Path The path of the table file. If the user wishes to predict parts of all samples,
+#' they can prepare a table file containing the names of selected samples (without
+#' column names).
 #' @param cluster.method A character indicating the algorithm used in the prediction for classification.
 #' Optional values include "RF" (random forest) and "SVM" (support vector machine).
 #' @param nodesize A parameter in the random forest. Details can be seen in
@@ -187,6 +190,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
                         random.sample.train=FALSE,
                         train.seeds=1234,
                         random.prob=0.7,
+                        PartSamples.Pred.Path=NULL,
                         miss_go.on=TRUE,rm.batch.effect=TRUE,
                         task=3,plot.combatch=FALSE,
                         print.combat.plots=FALSE,
@@ -449,6 +453,12 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     colnames(input.tumor.exp)<-col.label
     input.tumor.exp<-input.tumor.exp%>%t()%>%as.data.frame()
 
+    #是否只选择部分user's input samples进行预测？
+    if(!is.null(PartSamples.Pred.Path)){
+      PartSamples.Pred<-data.table::fread(PartSamples.Pred.Path,data.table = F,header = F)[,1]
+      input.tumor.exp<-input.tumor.exp[PartSamples.Pred,]
+    }
+
     if(task%in%c(2,3)&!is.null(input.clin.path)){
       input.tumor.dt<-cbind(input.clinsurv[rownames(input.tumor.exp),],input.tumor.exp)
     }else{if(task%in%c(2,3)){
@@ -461,6 +471,13 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
 
     input.tumor.exp=input.tumor.exp
     input.tumor.exp<-input.tumor.exp%>%t()%>%as.data.frame()
+
+    #是否只选择部分user's input samples进行预测？
+    if(!is.null(PartSamples.Pred.Path)){
+      PartSamples.Pred<-data.table::fread(PartSamples.Pred.Path,data.table = F,header = F)[,1]
+      input.tumor.exp<-input.tumor.exp[PartSamples.Pred,]
+    }
+
     if(task%in%c(2,3)&!is.null(input.clin.path)){
       input.tumor.dt<-cbind(input.clinsurv[rownames(input.tumor.exp),],input.tumor.exp)
     }else{if(task%in%c(2,3)){
@@ -481,6 +498,7 @@ oncoClassSurv<-function(exp.type="fpkm",gene.col.label="Features",
     train.tumor.dt <- train.tumor.dt[trains,]
     return.list[["TrainRandomSampling"]]<-table(train.tumor.dt$Cluster)
   }
+
 
   #choose task and perform that#
   if(task==1){

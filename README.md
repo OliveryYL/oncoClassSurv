@@ -56,8 +56,11 @@ large-scale predictions.
 
 In addition, to overcome the tedious steps of programming and make it 
 friendly for ordinary users, we developed an interactive application 
-based on Shiny. Users only need to use the command `oncoClassSurv_RunShiny()` 
-to visit it.
+based on Shiny. Users only need to use the command 
+`oncoClassSurv::oncoClassSurv_RunShiny()` to visit it. 
+We also have packaged the shinyAPP as an executable desktop 
+software (.exe) that can be run on the Windows operating system 
+([click here](https://github.com/OliveryYL/oncoClassSurv_Expansion/)).
 
 ### Data prepare
 

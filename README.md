@@ -373,6 +373,15 @@ The classification table is on the left. The prognosis table is on the right.
 7) Survival curves and the process to remove the batch effect.
 <img src="man/figures/README-runShinyAPP-demo6_select_samples_survival_and_combat.png" width="100%" />
 
-The online version of oncoClassSurv ShinyAPP (https://oncomanager.shinyapps.io/oncoClassSurv/).
+
+### Resource
+Multiple versions of the `oncoClassSurv` Shiny APP are available, including the local R package, 
+desktop executive, and online versions. Considering the uncertainty of the network, we 
+prioritize recommending the local R package or the desktop executive version to achieve a better 
+user experience.
+
+Video introduction to the `oncoClassSurv` Shiny APP (https://v.youku.com/v_show/id_XNjA3MjgzNDM2OA==.html).
+The desktop version (.exe) of the `oncoClassSurv` Shiny APP (https://github.com/OliveryYL/oncoClassSurv_Expansion/).
+The online version of the `oncoClassSurv` Shiny APP (https://oncomanager.shinyapps.io/oncoClassSurv/).
 
 Follow us for updates (https://github.com/OliveryYL/oncoClassSurv).

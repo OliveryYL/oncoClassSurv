@@ -381,7 +381,9 @@ prioritize recommending the local R package or the desktop executive version to 
 user experience.
 
 Video introduction to the `oncoClassSurv` Shiny APP (https://v.youku.com/v_show/id_XNjA3MjgzNDM2OA==.html).
+
 The desktop version (.exe) of the `oncoClassSurv` Shiny APP (https://github.com/OliveryYL/oncoClassSurv_Expansion/).
+
 The online version of the `oncoClassSurv` Shiny APP (https://oncomanager.shinyapps.io/oncoClassSurv/).
 
 Follow us for updates (https://github.com/OliveryYL/oncoClassSurv).
